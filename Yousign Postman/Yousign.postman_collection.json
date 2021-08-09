@@ -1,0 +1,323 @@
+{
+	"info": {
+		"_postman_id": "532a8de6-7ea5-4381-9cc9-78b495b75abb",
+		"name": "Yousign",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Tests using external data file",
+			"item": [
+				{
+					"name": "Test 2 Positive Create a user using CSV data file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.iterationData.set(\"firstName\", data.firstName);",
+									"pm.iterationData.set(\"lastName\", data.lastName);",
+									"pm.iterationData.set(\"email\", data.email);",
+									"pm.iterationData.set(\"title\", data.title);",
+									"pm.iterationData.set(\"phoneNumber\", data.phoneNumber);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"var jsonBody = JSON.parse(pm.request.body.raw);",
+									"pm.environment.set('firstName',jsonData.firstname)",
+									"pm.environment.set('lastName',jsonData.lastname)",
+									"",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"User first name is correctly inserted\", function() {",
+									"    pm.expect(jsonBody.firstname).to.eq(jsonData.firstname);",
+									"});",
+									"",
+									"pm.test(\"User last name is correctly inserted\", function() {",
+									"    pm.expect(jsonBody.lastname).to.eq(jsonData.lastname);",
+									"});",
+									"pm.test(\"User email is correctly inserted\", function() {",
+									"    pm.expect(jsonBody.email).to.eq(jsonData.email);",
+									"});",
+									"",
+									"pm.test(\"User title is correctly inserted\", function() {",
+									"    pm.expect(jsonBody.title).to.eq(jsonData.title);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstname\": \"{{firstName}}\",\n  \"lastname\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"title\": \"{{title}}\",\n  \"phone\": \"{{phoneNumber}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Test 1 Get users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"}); ",
+							"",
+							"pm.test(\"Full name of user is present\", function () {",
+							"    pm.expect(jsonData.fullName).to.not.eql(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test 2 Positive Create a user using random variable",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var jsonBody = JSON.parse(pm.request.body.raw);",
+							"pm.environment.set('firstName',jsonData.firstname)",
+							"pm.environment.set('lastName',jsonData.lastname)",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"User first name is correctly inserted\", function() {",
+							"    pm.expect(jsonBody.firstname).to.eq(jsonData.firstname);",
+							"});",
+							"",
+							"pm.test(\"User last name is correctly inserted\", function() {",
+							"    pm.expect(jsonBody.lastname).to.eq(jsonData.lastname);",
+							"});",
+							"pm.test(\"User email is correctly inserted\", function() {",
+							"    pm.expect(jsonBody.email).to.eql(jsonData.email)",
+							"});",
+							"pm.test(\"User title is correctly inserted\", function() {",
+							"    pm.expect(jsonBody.title).to.eq(jsonData.title);",
+							"    console.log(jsonData.title)",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{auth_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstname\": \"{{$randomFirstName}}\",\n  \"lastname\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomDomainWord}}@gmail.com\",\n  \"title\": \"{{$randomJobType}}\",\n  \"phone\": \"+33600006666\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test 3 Negative Create a user without an email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var jsonBody = JSON.parse(pm.request.body.raw);",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Mail is missing, Error is raised\", function() {",
+							"pm.expect(jsonData.email).to.be.undefined;",
+							"pm.expect(jsonData.detail).to.include(\"email: This value should not be blank\")    ",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstname\": \"Dosty\",\n  \"lastname\": \"K\",\n  \"email\": \"\",\n  \"title\": \"Author\",\n  \"phone\": \"+56845344567\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test 4 Get the users created in step 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(responseBody);",
+							"var firstName = pm.environment.get(\"firstName\");",
+							"var lastName = pm.environment.get(\"lastName\");",
+							"//console.log(jsonData);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Created user first name is present\", function () {",
+							"        pm.expect(jsonData).to.contain(firstName);",
+							"",
+							"});",
+							"pm.test(\"Created user last name is present\", function () {",
+							"        pm.expect(jsonData).to.contain(lastName);",
+							"",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
